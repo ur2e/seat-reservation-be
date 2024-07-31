@@ -1,12 +1,10 @@
 name: backend - CI
 
-# 워크플로 트리거 설정: main 브랜치에 대한 push 이벤트에 반응
 on:
   push:
     branches:
       - main
 
-# 환경 변수 설정
 env:
   AWS_REGION: ap-northeast-2
   ECR_REPOSITORY: back
@@ -49,12 +47,10 @@ jobs:
 
       - name: Update Kubernetes Deployment Manifest
         run: |
-          # Kubernetes 배포 매니페스트 파일 업데이트: 새 이미지로 매니페스트 파일 수정
-          sed -i "s|image: .*$|image: ${{ steps.docker_build.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}|" k8s/back-deploy.yaml
+          sed -i "20 c\        image: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}" k8s/back-deploy.yaml
           git config --global user.email "dbfl9711@gmail.com"
           git config --global user.name "ur2e"
           git add k8s/back-deploy.yaml
           git commit -m "update back-deploy.yaml"
-          git push origin main
-        # Git 설정 및 파일 커밋, 푸시: 변경된 파일을 커밋하고 main 브랜치로 푸시
-
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ur2e/seat-reservation-be.git HEAD:ci
+        # Git 설정 및 파일 커밋, 푸시: 변경된 파일을 커밋하고 ci 브랜치로 푸시
