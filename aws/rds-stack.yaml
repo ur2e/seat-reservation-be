@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to create MySQL RDS instance
+
+Parameters:
+  DBInstanceIdentifier:
+    Description: "The database instance identifier"
+    Type: String
+    Default: "kbsec-seat-reservation-db"
+
+  DBName:
+    Description: "The name of the database"
+    Type: String
+    Default: "dbname"
+
+  DBUser:
+    Description: "The database admin account username"
+    Type: String
+    Default: "admin"
+
+  DBPassword:
+    Description: "The database admin account password"
+    Type: String
+    NoEcho: true
+
+  DBAllocatedStorage:
+    Description: "The size of the database (Gb)"
+    Type: Number
+    Default: 20
+
+  DBInstanceClass:
+    Description: "The database instance type"
+    Type: String
+    Default: "db.t3.micro"
+
+  VPCSecurityGroupIds:
+    Description: "The VPC security group IDs for the database instance"
+    Type: List<AWS::EC2::SecurityGroup::Id>
+
+  DBSubnetIds:
+    Description: "The subnet IDs for the database instance"
+    Type: List<AWS::EC2::Subnet::Id>
+
+Resources:
+  MyDBSubnetGroup:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: "My DB Subnet Group"
+      SubnetIds: !Ref DBSubnetIds
+
+  MyDBInstance:
+    Type: AWS::RDS::DBInstance
+    Properties:
+      DBInstanceIdentifier: !Ref DBInstanceIdentifier
+      DBName: !Ref DBName
+      AllocatedStorage: !Ref DBAllocatedStorage
+      DBInstanceClass: !Ref DBInstanceClass
+      Engine: mysql
+      MasterUsername: !Ref DBUser
+      MasterUserPassword: !Ref DBPassword
+      VPCSecurityGroups: !Ref VPCSecurityGroupIds
+      DBSubnetGroupName: !Ref MyDBSubnetGroup
+      BackupRetentionPeriod: 7
+      PubliclyAccessible: true
+
+Outputs:
+  DBEndpoint:
+    Description: "The database endpoint"
+    Value: !GetAtt MyDBInstance.Endpoint.Address

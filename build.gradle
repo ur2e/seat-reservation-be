@@ -1,0 +1,51 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.3.2'
+    id 'io.spring.dependency-management' version '1.1.6'
+}
+
+group = 'com.kbsec'
+version = '0.0.1-SNAPSHOT'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // AWS SDK for S3, etc..
+    implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+    // AWS SDK for Rekognition
+    implementation 'com.amazonaws:aws-java-sdk-rekognition:1.12.400'
+    // AWS SDK for DynamoDB
+    implementation 'com.amazonaws:aws-java-sdk-dynamodb:1.12.400'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.27'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    // Jackson BOM
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.14.0')
+    implementation 'com.fasterxml.jackson.core:jackson-databind'
+    implementation 'com.fasterxml.jackson.core:jackson-annotations'
+    implementation 'com.fasterxml.jackson.core:jackson-core'
+
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+    useJUnitPlatform()
+}
