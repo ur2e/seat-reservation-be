@@ -1,0 +1,60 @@
+name: backend - CI
+
+# 워크플로 트리거 설정: main 브랜치에 대한 push 이벤트에 반응
+on:
+  push:
+    branches:
+      - main
+
+# 환경 변수 설정
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: back
+
+jobs:
+  build-and-push-image:
+    runs-on: ubuntu-20.04 # 작업이 실행될 러너의 OS 지정
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        # 코드 체크아웃: 현재 리포지토리 코드를 작업 디렉토리로 가져옴
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        # Docker Buildx 설정: 다중 플랫폼 이미지 빌드 환경 설정
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+        # AWS 자격 증명 설정: AWS에 접근하기 위한 자격 증명을 설정
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        # Amazon ECR 로그인: Docker 클라이언트를 ECR에 로그인
+
+      - name: Docker Build and ECR push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
+        # Docker 이미지 빌드 및 ECR 푸시: Dockerfile을 사용하여 이미지를 빌드하고 ECR에 푸시
+
+      - name: Update Kubernetes Deployment Manifest
+        run: |
+          # Kubernetes 배포 매니페스트 파일 업데이트: 새 이미지로 매니페스트 파일 수정
+          sed -i "s|image: .*$|image: ${{ steps.docker_build.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}|" k8s/back-deploy.yaml
+          git config --global user.email "dbfl9711@gmail.com"
+          git config --global user.name "ur2e"
+          git add k8s/back-deploy.yaml
+          git commit -m "update back-deploy.yaml"
+          git push origin main
+        # Git 설정 및 파일 커밋, 푸시: 변경된 파일을 커밋하고 main 브랜치로 푸시
+
