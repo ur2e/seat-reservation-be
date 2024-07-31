@@ -1,0 +1,43 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: seat-reservation-be
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  datasource:
+    url: ${RDS_URL}
+    username: admin
+    password: ${RDS_PW}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+
+cloud:
+  aws:
+    s3:
+      bucket: kbsec-seat-reservation
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+    credentials:
+      access-key: ${AWS_ACCESS_KEY}
+      secret-key: ${AWS_SECRET_KEY}
+
+logging:
+  level:
+    root: INFO
+    com.example: DEBUG
+
+aws:
+  rekognition:
+    collection: test
+  dynamodb:
+    table: face_recognition
