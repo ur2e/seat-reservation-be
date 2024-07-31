@@ -52,5 +52,5 @@ jobs:
           git config --global user.name "ur2e"
           git add k8s/back-deploy.yaml
           git commit -m "update back-deploy.yaml"
-          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/ur2e/seat-reservation-be.git HEAD:ci
+          git push https://x-access-token:${{ secrets.PAT_TOKEN }}@github.com/ur2e/seat-reservation-be.git HEAD:ci
         # Git 설정 및 파일 커밋, 푸시: 변경된 파일을 커밋하고 ci 브랜치로 푸시
