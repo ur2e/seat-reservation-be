@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: front
+  labels:
+    app: front
+spec:
+  replicas: 1
+  revisionHistoryLimit: 1
+  selector:
+    matchLabels:
+      app: front
+  template:
+    metadata:
+      labels:
+        app: front
+    spec:
+      containers:
+      - name: front
+        image: 992382486521.dkr.ecr.ap-northeast-2.amazonaws.com/front:1.0
+        ports:
+        - containerPort: 8080
+        envFrom:
+        - configMapRef:
+            name: front-cm
+        resources:
+          requests:
+            memory: "1000Mi"
+            cpu: 1500m
+          limits:
+            memory: "2000Mi"
+            cpu: 2000m

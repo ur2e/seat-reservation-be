@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: back
+  labels:
+    app: back
+spec:
+  replicas: 1
+  revisionHistoryLimit: 3
+  selector:
+    matchLabels:
+      app: back
+  template:
+    metadata:
+      labels:
+        app: back
+    spec:
+      containers:
+      - name: back
+        image: 992382486521.dkr.ecr.ap-northeast-2.amazonaws.com/back:1.0
+        ports:
+        - containerPort: 8090
+        envFrom:
+        - configMapRef:
+            name: back-cm
+        resources:
+          requests:
+            memory: "500Mi"
+            cpu: 1500m
+          limits:
+            memory: "1000Mi"
+            cpu: 2000m

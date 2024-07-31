@@ -1,0 +1,13 @@
+# Back Service
+apiVersion: v1
+kind: Service
+metadata:
+  labels: 
+    app: back
+  name: back
+spec:
+  selector:
+    app: back
+  ports:
+  - targetPort: 8090  
+    port: 8090
